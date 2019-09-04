@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+    <!-- 导入属性文件   -->
+    <!--    <context:property-placeholder location="classpath:database.properties"/>-->
+    <!--    <bean class="org.springframework.jndi.JndiObjectFactoryBean" id="dataSource">-->
+    <!--        <property name="jndiName">-->
+    <!--            <value>java:comp/env/jdbc/smbms</value>-->
+    <!--        </property>-->
+    <!--    </bean>-->
+    <!--扫描包下的注解信息-->
+<!--    <context:component-scan base-package="com.bdqn.conlletion"/>-->
+    <!--配置属性文件作为数据源-->
+        <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+            <property name="locations">
+                <list>
+                    <value>classpath*:database.properties</value>
+                </list>
+            </property>
+        </bean>
+
+    <bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource">
+        <property name="driverClassName" value="${driver}"/>
+        <property name="url" value='${url}'/>
+        <property name="username" value='${username}'/>
+        <property name="password" value='${password}'/>
+    </bean>
+
+    <!--    配置本地文件地址-->
+    <!--    <mvc:resources mapping="/calendar/" location="/calendar/" />-->
+    <!--    <mvc:resources mapping="/css/" location="/css/**" />-->
+    <!--    <mvc:resources mapping="/images/" location="/images/**" />-->
+    <!--    <mvc:resources mapping="/js/" location="/js/**" />-->
+
+
+    <!-- 3、配置mybatis-plus的sqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="com.baomidou.mybatisplus.spring.MybatisSqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+<!--        <property name="configLocation" value="classpath:mybatis-config.xml"/>-->
+        <property name="typeAliasesPackage" value="src/cn.imook.com/entity"/>
+        <property name="mapperLocations" value="cn/imook/com/dao/*.xml"></property>
+        <property name="plugins">
+            <list>
+                <!-- 分页插件 -->
+                <bean class="com.baomidou.mybatisplus.plugins.PaginationInterceptor"/>
+                <bean class="com.baomidou.mybatisplus.plugins.PerformanceInterceptor">
+                    <property name="format" value="true"/><!-- 格式化SQL语句 -->
+                    <property name="maxTime" value="1000"/><!-- sql执行时间超过value值就会停止执行，单位是毫秒 -->
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+<!--    <bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSession " autowire="byName">-->
+<!--        &lt;!&ndash; 设置别名 &ndash;&gt;-->
+<!--        <property name="typeAliasesPackage" value="com.bdqn.entity"></property>-->
+<!--        &lt;!&ndash; 关联myBatis的sql映射文件 &ndash;&gt;-->
+<!--        <property name="mapperLocations">-->
+<!--            <list>-->
+<!--                <value>com/bdqn/conlletion/*.xml</value>-->
+<!--            </list>-->
+<!--        </property>-->
+<!--    </bean>-->
+    <!--     自动映射的实现类-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer" id="configurer">
+        <property name="basePackage" value="cn.imook.com.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+
+<!--    &lt;!&ndash;配置SpringMVC&ndash;&gt;-->
+<!--    <context:component-scan base-package="com.bdqn.controller"/>-->
+<!--    <context:component-scan base-package="com.bdqn.services"/>-->
+<!--    &lt;!&ndash;自动注册&ndash;&gt;-->
+<!--    <mvc:default-servlet-handler/>-->
+<!--    <mvc:annotation-driven/>-->
+<!--    &lt;!&ndash;配置路径前缀后缀&ndash;&gt;-->
+<!--    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" p:prefix="/jsp/" p:suffix=".jsp"/>-->
+</beans>
